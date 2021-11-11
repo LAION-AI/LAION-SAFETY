@@ -2,7 +2,7 @@
 A open toolbox for NSFW &amp; toxicity detection
 
 # Overview
-We present an ensemble of a NSFW image classifier ( based on EfficientNet V2, B2 260x260, https://github.com/google/automl/tree/master/efficientnetv2 ) together with Detoxify ( https://github.com/unitaryai/detoxify ), an existing language model for toxicity detection.
+We present a NSFW image-text-pair classifcation ensemble, which consists of an image classifier ( based on EfficientNet V2, B2 260x260, https://github.com/google/automl/tree/master/efficientnetv2 ) combined with Detoxify ( https://github.com/unitaryai/detoxify ), an existing language model for toxicity detection.
 
 The image classifier had been trained on 682550 images from the 5 classes "Drawing" (39026), "Hentai" (28134), "Neutral" (369507), "Porn" (207969) & "Sexy" (37914).
 
@@ -12,7 +12,7 @@ To evaluate the performance of the image classifier together with & without addi
 
 To use our 5 class image classifier as a binary SFW - NSFW classifier, we consider images from the classes "Drawing" & "Neutral" as SFW and "Hentai", "Porn" & "Sexy" as NSFW.
 
---> Our image classifier predicts 96,45 % of the true NSFW correctly as NSFW (false negatives) and discards 7,96 % of the SFW images incorrectly as NSFW (false positives).
+--> Our image classifier predicts 96,45 % of the true NSFW correctly as NSFW and discards 7,96 % of the SFW images incorrectly as NSFW.
 
 
 False negatives: 3,55% 
