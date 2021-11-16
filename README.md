@@ -46,6 +46,15 @@ False positives: 5,33%
 
 --> This ensemble predicts 1,3 % less false negatives & 2,6 % less false positives than our image classifier alone.
 
+# Preparations
+
+Here can you download our EfficientNet V2 based NSFW image classifier:
+
+It needs to be in the same directory as the inference script.
+
+Install Detoxify with:
+pip install detoxify
+
 
 # Inference
 
