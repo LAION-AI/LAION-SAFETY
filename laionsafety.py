@@ -1,7 +1,10 @@
-image_size =260
+image_size =260 # resolution of the image classifier
 
-batchsize=1024
-SHARDS = "{00000..00002}.tar"
+batchsize=1024 #batchsize for inference. Lower if you get  OOM errors
+
+datadir = "./laion400m-dat-release/" # dir where the tar files are located
+SHARDS = "{00000..00002}.tar" # format of the tar files
+
 
 targetdir1= "./drawings/"
 targetdir2= "./hentai/"
@@ -61,7 +64,7 @@ def filter_dataset(item): # For e.g. C@H which (rarely) has no caption available
       return True
 
 # pack image inference into its own process, to make sure all GPU memory is freed afterwards for the Detoxify inference
-def image_classifier(caption_list,prediction_list):
+def image_classifier(caption_list,prediction_list,datadir):
 
 
   from tensorflow.python.data.experimental.ops.distribute_options import AutoShardPolicy
@@ -69,13 +72,11 @@ def image_classifier(caption_list,prediction_list):
   import tensorflow as tf
   import tensorflow_hub as hub
 
-  ds = wds.WebDataset("./laion400m-dat-release/"+SHARDS, handler=wds.ignore_and_continue).select(filter_dataset).decode('rgb').to_tuple('jpg', 'txt')
+  ds = wds.WebDataset(datadir+SHARDS, handler=wds.ignore_and_continue).select(filter_dataset).decode('rgb').to_tuple('jpg', 'txt')
 
   dl = wds.WebLoader(ds, shuffle=False, num_workers=16, batch_size=batchsize, prefetch_factor=4*batchsize)  #, prefetch_factor=4*batchsize, pin_memory=True
   c=0
   start =time.time()
-
-
 
   model = tf.keras.models.load_model('nsfweffnetv2-b02-3epochs.h5',custom_objects={"KerasLayer":hub.KerasLayer})
   os.system("nvidia-smi")
@@ -97,7 +98,7 @@ def image_classifier(caption_list,prediction_list):
     captions= []
     txt_list = list (txt)
     for e in txt_list:
-      captions.append(e[:200])
+      captions.append(e[:200]) # captions are cut off after 200 characters, to avoid OOM errors
 
 
     caption_list.append(captions)
@@ -119,7 +120,7 @@ manager = Manager()
 prediction_list= manager.list()
 caption_list= manager.list()
 p=[]
-p.append(Process(target=image_classifier, args=(caption_list,prediction_list )))
+p.append(Process(target=image_classifier, args=(caption_list,prediction_list, datadir )))
 p[0].start()
 p[0].join()
 
