@@ -1,5 +1,7 @@
 image_size =260
 
+batchsize=1024
+SHARDS = "{00000..00002}.tar"
 
 targetdir1= "./drawings/"
 targetdir2= "./hentai/"
@@ -42,28 +44,6 @@ from detoxify import Detoxify
 import multiprocessing
 from multiprocessing import Process , Manager
 
-
-batchsize=1024
-SHARDS = "{00000..00002}.tar"
-
-'''
-gpus = tf.config.list_physical_devices('GPU')
-if gpus:
-  # Restrict TensorFlow to only allocate 1GB of memory on the first GPU
-  try:
-    tf.config.set_logical_device_configuration(
-        gpus[0],
-        [tf.config.LogicalDeviceConfiguration(memory_limit=8096)])
-    logical_gpus = tf.config.list_logical_devices('GPU')
-    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
-  except RuntimeError as e:
-    # Virtual devices must be set before GPUs have been initialized
-    print(e)
-# Recreate the exact same model, including its weights and the optimizer
-#loaded_model = tf.keras.models.load_model('/content/resnetv2-nsfw/nsfweffnetv2-lion.h5',custom_objects={"KerasLayer":hub.KerasLayer})
-'''
-
-
 import webdataset as wds
 import torch
 import tensorflow as tf
@@ -80,7 +60,7 @@ def filter_dataset(item): # For e.g. C@H which (rarely) has no caption available
           return False
       return True
 
-
+# pack image inference into its own process, to make sure all GPU memory is freed afterwards for the Detoxify inference
 def image_classifier(caption_list,prediction_list):
 
 
@@ -119,11 +99,7 @@ def image_classifier(caption_list,prediction_list):
     for e in txt_list:
       captions.append(e[:200])
 
-    '''
-    print(type(captions[0]))
-    print(captions[0])
-    print(captions)
-    '''
+
     caption_list.append(captions)
     print(c)
     print("image predition time")
@@ -131,8 +107,6 @@ def image_classifier(caption_list,prediction_list):
   del model
   tf.keras.backend.clear_session()
 
-#caption_list
-#prediction_list
 
 start =time.time()
 
@@ -150,7 +124,6 @@ p[0].start()
 p[0].join()
 
 
-#reload(tensorflow_hubs)
 model_txt = Detoxify('multilingual', device='cuda')
 os.system("nvidia-smi")
 
