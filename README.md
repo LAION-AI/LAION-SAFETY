@@ -49,6 +49,7 @@ False positives: 5,33%
 # Preparations
 
 Here can you download our EfficientNet V2 based NSFW image classifier:
+https://drive.google.com/file/d/1NkDsWtjyMrak5dnw8JYJBwovifIB89uS/view?usp=sharing
 
 It needs to be in the same directory as the inference script.
 
